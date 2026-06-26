@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMDS Swarm Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    <div class="container">
+        <header>
+            <div class="logo">AMDS</div>
+            <h1>Autonomous M&A Due Diligence Swarm</h1>
+            <p class="subtitle">Multi-Agent Cognitive Risk Orchestration Engine</p>
+        </header>
+
+        <main>
+            <section class="input-panel glass-card">
+                <h2>Analyze Clause</h2>
+                <p class="description">Enter an M&A contract clause to run parallelized legal & financial due diligence.</p>
+                <textarea id="clauseInput" placeholder="Paste target contract clause here... (e.g. 'The acquiring company shall absorb undisclosed historical tax liabilities up to $50M...')"></textarea>
+                
+                <div class="presets">
+                    <span class="preset-label">Presets:</span>
+                    <button class="preset-btn" onclick="loadPreset(1)">Tax Liabilities Cap</button>
+                    <button class="preset-btn" onclick="loadPreset(2)">IP Indemnification Limit</button>
+                    <button class="preset-btn" onclick="loadPreset(3)">Antitrust Break-up Fee</button>
+                </div>
+
+                <button id="runBtn" onclick="runAnalysis()">
+                    <span class="btn-text">Execute Swarm</span>
+                    <span class="btn-glow"></span>
+                </button>
+            </section>
+
+            <section class="swarm-monitor glass-card">
+                <h2>Swarm Monitor</h2>
+                <p class="description">Real-time status tracking of concurrent agent threads.</p>
+                
+                <div class="timeline">
+                    <div class="timeline-step" id="step-ingest">
+                        <div class="status-indicator"></div>
+                        <div class="step-content">
+                            <h3>1. Ingestion Phase</h3>
+                            <p>Deconstructing clause into atomic components.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step-dispatch">
+                        <div class="status-indicator"></div>
+                        <div class="step-content">
+                            <h3>2. Dispatching Sub-Tasks</h3>
+                            <p>Querying Legal Agent & Finance Agent concurrently.</p>
+                        </div>
+                        <div class="sub-threads">
+                            <div class="thread" id="thread-legal">
+                                <span class="thread-name">legal_agent.py</span>
+                                <span class="thread-status">Idle</span>
+                            </div>
+                            <div class="thread" id="thread-finance">
+                                <span class="thread-name">finance_agent.py</span>
+                                <span class="thread-status">Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="step-synthesize">
+                        <div class="status-indicator"></div>
+                        <div class="step-content">
+                            <h3>3. Synthesize & Critique</h3>
+                            <p>Lead M&A Architect compiling executive summary & 3 Red Flags.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="output-panel glass-card full-width">
+                <h2>Executive Synthesis Report</h2>
+                <div class="report-box" id="reportOutput">
+                    <div class="empty-state">
+                        <p>No analysis run yet. Enter a clause above and execute the swarm.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
