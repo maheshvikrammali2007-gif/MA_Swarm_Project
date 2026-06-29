@@ -381,7 +381,7 @@ textarea:focus {
    NEW FRONTEND UPGRADES: CURSOR, SVG VISUALIZER, RISK METER, MODAL & FOOTER
    ========================================================================== */
 
-/* 1. Custom Animated Cursor */
+/* 1. Custom Animated Cursor - Sci-Fi HUD Reticle */
 body {
     cursor: none; /* Hide default cursor on desktop */
 }
@@ -390,9 +390,9 @@ a, button, textarea, input, .preset-btn, .close-modal-btn {
     cursor: none !important; /* Ensure children hide default cursor too */
 }
 
-.custom-cursor-dot, .custom-cursor-ring {
-    width: 6px;
-    height: 6px;
+.custom-cursor-dot {
+    width: 4px;
+    height: 4px;
     background: var(--accent-neon-blue);
     position: fixed;
     top: 0;
@@ -401,31 +401,77 @@ a, button, textarea, input, .preset-btn, .close-modal-btn {
     pointer-events: none;
     z-index: 99999;
     transform: translate3d(-50%, -50%, 0);
-    transition: width 0.15s, height 0.15s, opacity 0.15s, background-color 0.15s;
+    transition: transform 0.1s ease-out, background-color 0.2s, opacity 0.2s;
+    box-shadow: 0 0 6px var(--accent-neon-blue);
 }
 
 .custom-cursor-ring {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     background: transparent;
-    border: 1px solid rgba(0, 240, 255, 0.4);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate3d(-50%, -50%, 0);
     /* Faster lag effect on ring */
     transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
 }
 
-/* Interactive elements hover state - scales down & shifts opacity */
+.custom-cursor-ring::before,
+.custom-cursor-ring::after {
+    content: '';
+    position: absolute;
+    background: var(--accent-neon-blue);
+    transition: all 0.25s ease-out;
+}
+
+/* Vertical crosshair ticks */
+.custom-cursor-ring::before {
+    top: -4px;
+    bottom: -4px;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, var(--accent-neon-blue) 3px, transparent 3px, transparent calc(100% - 3px), var(--accent-neon-blue) calc(100% - 3px));
+}
+
+/* Horizontal crosshair ticks */
+.custom-cursor-ring::after {
+    left: -4px;
+    right: -4px;
+    top: 50%;
+    height: 1px;
+    transform: translateY(-50%);
+    background: linear-gradient(to right, var(--accent-neon-blue) 3px, transparent 3px, transparent calc(100% - 3px), var(--accent-neon-blue) calc(100% - 3px));
+}
+
+/* Interactive elements hover state - expands, rotates, and morphs color */
 .custom-cursor-ring.hovering {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-color: rgba(255, 0, 127, 0.6);
-    background: rgba(255, 0, 127, 0.05);
-    box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+    background: rgba(255, 0, 127, 0.03);
+    box-shadow: 0 0 12px rgba(255, 0, 127, 0.4);
+    transform: translate3d(-50%, -50%, 0) rotate(45deg);
+}
+
+.custom-cursor-ring.hovering::before {
+    background: linear-gradient(to bottom, var(--accent-neon-pink) 2px, transparent 2px, transparent calc(100% - 2px), var(--accent-neon-pink) calc(100% - 2px));
+}
+
+.custom-cursor-ring.hovering::after {
+    background: linear-gradient(to right, var(--accent-neon-pink) 2px, transparent 2px, transparent calc(100% - 2px), var(--accent-neon-pink) calc(100% - 2px));
 }
 
 .custom-cursor-dot.hovering {
     background: var(--accent-neon-pink);
-    transform: translate3d(-50%, -50%, 0) scale(1.5);
+    transform: translate3d(-50%, -50%, 0) scale(1.2);
+    box-shadow: 0 0 8px var(--accent-neon-pink);
 }
 
 /* Hide on mobile devices and touchscreens */
@@ -822,99 +868,6 @@ a, button, textarea, input, .preset-btn, .close-modal-btn {
     color: var(--accent-neon-blue);
 }
 
-/* 7. Gemini API Key Configuration Panel */
-.api-key-config {
-    margin: 25px auto 0 auto;
-    max-width: 480px;
-    padding: 15px 20px;
-    text-align: left;
-    background: rgba(22, 28, 45, 0.5);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.api-key-config label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    display: block;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.api-key-input-wrapper {
-    display: flex;
-    gap: 10px;
-}
-
-.api-key-input-wrapper input {
-    flex-grow: 1;
-    background: rgba(10, 15, 30, 0.7);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 8px 12px;
-    color: var(--text-primary);
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.api-key-input-wrapper input:focus {
-    border-color: var(--accent-neon-blue);
-}
-
-.api-key-input-wrapper button {
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-emerald));
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-weight: 600;
-    font-size: 0.85rem;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.api-key-input-wrapper button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-}
-
-.api-key-input-wrapper button:active {
-    transform: translateY(0);
-}
-
-.api-status-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.status-indicator-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ef4444; /* Default missing red */
-    display: inline-block;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    box-shadow: 0 0 6px #ef4444;
-}
-
-.status-indicator-dot.active {
-    background: var(--accent-emerald);
-    box-shadow: 0 0 6px var(--accent-emerald);
-}
-
-.api-status-text {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.api-status-text.active {
-    color: var(--text-primary);
-}
+/* API config styles removed */
 
 

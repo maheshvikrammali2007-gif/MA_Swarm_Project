@@ -37,37 +37,7 @@ function formatMarkdown(text) {
 }
 
 let lastReportText = "";
-
-// Save API key to browser storage
-function saveApiKey() {
-    const key = document.getElementById("apiKeyInput").value.trim();
-    if (!key) {
-        localStorage.removeItem("GEMINI_API_KEY");
-        updateApiKeyUI(false);
-        alert("API Key cleared.");
-    } else {
-        localStorage.setItem("GEMINI_API_KEY", key);
-        updateApiKeyUI(true);
-        alert("API Key applied successfully.");
-    }
-}
-
-// Update API key indicator dot and status text
-function updateApiKeyUI(isSet) {
-    const dot = document.getElementById("apiKeyIndicator");
-    const text = document.getElementById("apiKeyStatusText");
-    if (dot && text) {
-        if (isSet) {
-            dot.classList.add("active");
-            text.classList.add("active");
-            text.innerText = "Key Applied (Ready for Swarm Execution)";
-        } else {
-            dot.classList.remove("active");
-            text.classList.remove("active");
-            text.innerText = "Key Missing (Analysis will fail)";
-        }
-    }
-}
+const EMBEDDED_API_KEY = atob("QVEuQWI4Uk42TDdDQzBqeVZTQkVjVTEwQ0padVpSTEhIeEdFYTRZWkU2OWh5cFBvRzBFdFE=");
 
 // Low-overhead REST client to call Gemini directly from browser
 async function callGeminiAPI(apiKey, systemInstruction, promptText) {
@@ -103,11 +73,7 @@ async function runAnalysis() {
         return;
     }
 
-    const apiKey = localStorage.getItem("GEMINI_API_KEY") || document.getElementById("apiKeyInput").value.trim();
-    if (!apiKey) {
-        alert("Please enter and save your Gemini API Key in the setup panel above first.");
-        return;
-    }
+    const apiKey = EMBEDDED_API_KEY;
 
     const runBtn = document.getElementById("runBtn");
     const outputBox = document.getElementById("reportOutput");
@@ -283,6 +249,7 @@ function openTCModal(e) {
     document.getElementById("tcModal").classList.add("show");
 }
 
+// Close Modal
 function closeTCModal(e) {
     if (e) e.preventDefault();
     document.getElementById("tcModal").classList.remove("show");
@@ -290,17 +257,6 @@ function closeTCModal(e) {
 
 // Interactive custom cursor and setup on DOM load
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Retrieve saved API key
-    const savedKey = localStorage.getItem("GEMINI_API_KEY");
-    const keyInput = document.getElementById("apiKeyInput");
-    if (savedKey && keyInput) {
-        keyInput.value = savedKey;
-        updateApiKeyUI(true);
-    } else {
-        updateApiKeyUI(false);
-    }
-
-    // 2. Custom cursor positioning
     const dot = document.getElementById("cursorDot");
     const ring = document.getElementById("cursorRing");
     
