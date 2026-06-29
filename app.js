@@ -132,9 +132,7 @@ async function runAnalysis() {
         
         const financeSystem = `You are the Finance Agent. Your role is to analyze M&A clauses for financial risks, tax exposure, hidden costs, payment terms, debt obligations, escrow rules, and valuation impacts. Provide precise, quantified financial analysis. If a clause does not contain financial elements, report 'NOT FOUND'.`;
 
-        // 1. INGEST (Simulation triggers client-side API verify call)
-        const deconstructPrompt = `Deconstruct the following legal clause into atomic components for analysis: '${clause}'`;
-        await callGeminiAPI(apiKey, ingestSystem, deconstructPrompt);
+        // 1. INGEST (Simulated deconstruction is executed client-side via delay)
 
         // 2. DISPATCH (Concurrently query sub-agents in parallel)
         const legalTask = callGeminiAPI(apiKey, legalSystem, clause);
@@ -192,9 +190,18 @@ async function runAnalysis() {
         
     } catch (error) {
         console.error(error);
-        outputBox.innerHTML = `<div class="empty-state" style="color: #ff007f;"><p>❌ Error: ${error.message}</p></div>`;
+        let errorMsg = error.message;
+        let isRateLimit = errorMsg.toLowerCase().includes("quota") || errorMsg.toLowerCase().includes("limit") || errorMsg.includes("429");
+        
+        if (isRateLimit) {
+            errorMsg = "Google Gemini free tier rate limit exceeded. Please wait 30 seconds and click 'Execute Swarm' again.";
+            outputBox.innerHTML = `<div class="empty-state" style="color: #f59e0b;"><p>⚠️ ${errorMsg}</p></div>`;
+        } else {
+            outputBox.innerHTML = `<div class="empty-state" style="color: #ff007f;"><p>❌ Error: ${errorMsg}</p></div>`;
+        }
+        
         systemStatus.className = "status-val text-idle";
-        systemStatus.innerText = "Error Occurred";
+        systemStatus.innerText = isRateLimit ? "Rate Limit Active" : "Error Occurred";
         
         nodeArchitect.className = "node node-architect";
         nodeLegal.className = "node";
