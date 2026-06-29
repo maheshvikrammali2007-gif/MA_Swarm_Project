@@ -12,6 +12,14 @@
     <div class="custom-cursor-ring" id="cursorRing"></div>
     <div class="glow-bg"></div>
     <div class="container">
+        <div class="developer-settings">
+            <button class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Settings</button>
+            <div id="settingsPanel" class="settings-panel glass-card" style="display: none;">
+                <label for="customKeyInput">Gemini API Key (Override):</label>
+                <input type="password" id="customKeyInput" placeholder="Paste custom API key..." oninput="saveCustomKey()" />
+                <p class="settings-notice">Leave blank to use default embedded key. Saved locally in browser.</p>
+            </div>
+        </div>
         <header>
             <div class="logo">AMDS</div>
             <h1>Autonomous M&A Due Diligence Swarm</h1>

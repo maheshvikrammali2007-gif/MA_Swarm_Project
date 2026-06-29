@@ -870,4 +870,78 @@ a, button, textarea, input, .preset-btn, .close-modal-btn {
 
 /* API config styles removed */
 
+/* 7. Developer Settings Dropdown Panel */
+.developer-settings {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.settings-toggle-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: none !important;
+    transition: all 0.2s;
+}
+
+.settings-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.settings-panel {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: 280px;
+    padding: 15px;
+    background: rgba(11, 15, 25, 0.95);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    text-align: left;
+}
+
+.settings-panel label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.settings-panel input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    outline: none;
+    cursor: none !important;
+    transition: border-color 0.2s;
+}
+
+.settings-panel input:focus {
+    border-color: var(--accent-neon-blue);
+}
+
+.settings-notice {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.2;
+}
+
+
 

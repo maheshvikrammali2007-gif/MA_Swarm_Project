@@ -73,7 +73,7 @@ async function runAnalysis() {
         return;
     }
 
-    const apiKey = EMBEDDED_API_KEY;
+    const apiKey = localStorage.getItem("CUSTOM_GEMINI_API_KEY") || EMBEDDED_API_KEY;
 
     const runBtn = document.getElementById("runBtn");
     const outputBox = document.getElementById("reportOutput");
@@ -262,8 +262,33 @@ function closeTCModal(e) {
     document.getElementById("tcModal").classList.remove("show");
 }
 
+// Toggle custom API key settings panel
+function toggleSettingsPanel() {
+    const panel = document.getElementById("settingsPanel");
+    if (panel) {
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+}
+
+// Save custom API key override
+function saveCustomKey() {
+    const key = document.getElementById("customKeyInput").value.trim();
+    if (!key) {
+        localStorage.removeItem("CUSTOM_GEMINI_API_KEY");
+    } else {
+        localStorage.setItem("CUSTOM_GEMINI_API_KEY", key);
+    }
+}
+
 // Interactive custom cursor and setup on DOM load
 document.addEventListener("DOMContentLoaded", () => {
+    // Pre-fill custom API key override if present
+    const savedCustomKey = localStorage.getItem("CUSTOM_GEMINI_API_KEY");
+    const customInput = document.getElementById("customKeyInput");
+    if (savedCustomKey && customInput) {
+        customInput.value = savedCustomKey;
+    }
+
     const dot = document.getElementById("cursorDot");
     const ring = document.getElementById("cursorRing");
     
