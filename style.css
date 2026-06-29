@@ -822,3 +822,99 @@ a, button, textarea, input, .preset-btn, .close-modal-btn {
     color: var(--accent-neon-blue);
 }
 
+/* 7. Gemini API Key Configuration Panel */
+.api-key-config {
+    margin: 25px auto 0 auto;
+    max-width: 480px;
+    padding: 15px 20px;
+    text-align: left;
+    background: rgba(22, 28, 45, 0.5);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.api-key-config label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.api-key-input-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.api-key-input-wrapper input {
+    flex-grow: 1;
+    background: rgba(10, 15, 30, 0.7);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.api-key-input-wrapper input:focus {
+    border-color: var(--accent-neon-blue);
+}
+
+.api-key-input-wrapper button {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-emerald));
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.api-key-input-wrapper button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.api-key-input-wrapper button:active {
+    transform: translateY(0);
+}
+
+.api-status-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.status-indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444; /* Default missing red */
+    display: inline-block;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 0 6px #ef4444;
+}
+
+.status-indicator-dot.active {
+    background: var(--accent-emerald);
+    box-shadow: 0 0 6px var(--accent-emerald);
+}
+
+.api-status-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.api-status-text.active {
+    color: var(--text-primary);
+}
+
+

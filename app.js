@@ -38,10 +38,74 @@ function formatMarkdown(text) {
 
 let lastReportText = "";
 
+// Save API key to browser storage
+function saveApiKey() {
+    const key = document.getElementById("apiKeyInput").value.trim();
+    if (!key) {
+        localStorage.removeItem("GEMINI_API_KEY");
+        updateApiKeyUI(false);
+        alert("API Key cleared.");
+    } else {
+        localStorage.setItem("GEMINI_API_KEY", key);
+        updateApiKeyUI(true);
+        alert("API Key applied successfully.");
+    }
+}
+
+// Update API key indicator dot and status text
+function updateApiKeyUI(isSet) {
+    const dot = document.getElementById("apiKeyIndicator");
+    const text = document.getElementById("apiKeyStatusText");
+    if (dot && text) {
+        if (isSet) {
+            dot.classList.add("active");
+            text.classList.add("active");
+            text.innerText = "Key Applied (Ready for Swarm Execution)";
+        } else {
+            dot.classList.remove("active");
+            text.classList.remove("active");
+            text.innerText = "Key Missing (Analysis will fail)";
+        }
+    }
+}
+
+// Low-overhead REST client to call Gemini directly from browser
+async function callGeminiAPI(apiKey, systemInstruction, promptText) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            contents: [
+                {
+                    parts: [{ text: promptText }]
+                }
+            ],
+            systemInstruction: {
+                parts: [{ text: systemInstruction }]
+            }
+        })
+    });
+    
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error?.message || "Gemini API request failed.");
+    }
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "NO DETAILS GENERATED";
+}
+
 async function runAnalysis() {
     const clause = document.getElementById("clauseInput").value.trim();
     if (!clause) {
         alert("Please enter or select a clause to analyze.");
+        return;
+    }
+
+    const apiKey = localStorage.getItem("GEMINI_API_KEY") || document.getElementById("apiKeyInput").value.trim();
+    if (!apiKey) {
+        alert("Please enter and save your Gemini API Key in the setup panel above first.");
         return;
     }
 
@@ -89,45 +153,64 @@ async function runAnalysis() {
     outputBox.innerHTML = '<div class="empty-state"><p>Querying sub-agent threads in parallel...</p></div>';
 
     try {
-        const response = await fetch("/analyze", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ clause })
-        });
+        // System Instructions & Prompts
+        const ingestSystem = `You are the Lead M&A Architect. Your goal is to coordinate a swarm of specialized agents (Legal, Finance, Research) to analyze M&A documents.
+        Your workflow must always follow these steps:
+        1. INGEST: Deconstruct the legal clause into atomic components.
+        2. DISPATCH: Delegate sub-tasks to the specific agent required.
+        3. SYNTHESIZE: Combine the outputs into a coherent, executive-level report.
+        4. CRITIQUE: Add a 'Red Flag' summary at the bottom, highlighting the 3 highest risks.
+        Maintain a professional, ruthless, and analytical tone. Never hallucinate—if data is missing, report 'NOT FOUND'.`;
+
+        const legalSystem = `You are the Legal Agent. Your role is to analyze M&A clauses for legal risks, including liabilities, indemnification, jurisdiction, warranties, compliance, and dispute resolution. Provide direct, ruthless, and precise legal analysis. If a clause does not contain legal elements, report 'NOT FOUND'.`;
         
-        const result = await response.json();
+        const financeSystem = `You are the Finance Agent. Your role is to analyze M&A clauses for financial risks, tax exposure, hidden costs, payment terms, debt obligations, escrow rules, and valuation impacts. Provide precise, quantified financial analysis. If a clause does not contain financial elements, report 'NOT FOUND'.`;
+
+        // 1. INGEST (Simulation triggers client-side API verify call)
+        const deconstructPrompt = `Deconstruct the following legal clause into atomic components for analysis: '${clause}'`;
+        await callGeminiAPI(apiKey, ingestSystem, deconstructPrompt);
+
+        // 2. DISPATCH (Concurrently query sub-agents in parallel)
+        const legalTask = callGeminiAPI(apiKey, legalSystem, clause);
+        const financeTask = callGeminiAPI(apiKey, financeSystem, clause);
         
-        if (response.status !== 200) {
-            throw new Error(result.error || "Swarm execution failed.");
-        }
+        const [legalReport, financeReport] = await Promise.all([legalTask, financeTask]);
         
-        // Parallel sub-agents completed
+        // 3. SYNTHESIZE & CRITIQUE
         nodeLegal.className = "node completed";
         nodeFinance.className = "node completed";
         pathLegal.className = "connector-path active"; // Keep lines glowing
         pathFinance.className = "connector-path active";
         
-        // Synthesis compiling
         nodeArchitect.className = "node node-architect active pulsing";
         systemStatus.className = "status-val text-synthesize";
         systemStatus.innerText = "Synthesizing Results...";
         outputBox.innerHTML = '<div class="empty-state"><p>Lead M&A Architect compiling reports and critique...</p></div>';
         
-        await new Promise(r => setTimeout(r, 1500));
+        const synthesisPrompt = `Combine these analyses for the original clause: "${clause}"
+        
+        Sub-Agent Inputs:
+        - Legal Agent Analysis:
+        ${legalReport}
+        
+        - Finance Agent Analysis:
+        ${financeReport}
+        
+        Please synthesize this into a coherent executive report and critique with a 'Red Flag' summary of the 3 highest risks.`;
+
+        const finalReport = await callGeminiAPI(apiKey, ingestSystem, synthesisPrompt);
         
         nodeArchitect.className = "node node-architect completed";
         systemStatus.className = "status-val text-done";
         systemStatus.innerText = "Analysis Complete";
         
         // Render Report
-        outputBox.innerHTML = formatMarkdown(result.report);
-        lastReportText = result.report;
+        outputBox.innerHTML = formatMarkdown(finalReport);
+        lastReportText = finalReport;
         exportBtn.disabled = false;
         
         // Process risk rating & confidence score
-        const riskRating = parseRisk(result.report);
+        const riskRating = parseRisk(finalReport);
         const confidence = Math.floor(Math.random() * 15) + 84; // 84% to 98%
         
         const riskBar = document.getElementById("riskProgressBar");
@@ -205,8 +288,19 @@ function closeTCModal(e) {
     document.getElementById("tcModal").classList.remove("show");
 }
 
-// Interactive custom cursor behavior
+// Interactive custom cursor and setup on DOM load
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Retrieve saved API key
+    const savedKey = localStorage.getItem("GEMINI_API_KEY");
+    const keyInput = document.getElementById("apiKeyInput");
+    if (savedKey && keyInput) {
+        keyInput.value = savedKey;
+        updateApiKeyUI(true);
+    } else {
+        updateApiKeyUI(false);
+    }
+
+    // 2. Custom cursor positioning
     const dot = document.getElementById("cursorDot");
     const ring = document.getElementById("cursorRing");
     
@@ -232,4 +326,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
 

@@ -17,6 +17,18 @@
             <h1>Autonomous M&A Due Diligence Swarm</h1>
             <p class="subtitle">Multi-Agent Cognitive Risk Orchestration Engine</p>
             <div class="developer-badge">Developed by Mahesh</div>
+            
+            <div class="api-key-config glass-card">
+                <label for="apiKeyInput">Gemini API Key Setup</label>
+                <div class="api-key-input-wrapper">
+                    <input type="password" id="apiKeyInput" placeholder="Paste your Google Gemini API Key here..." />
+                    <button id="saveKeyBtn" onclick="saveApiKey()">Apply Key</button>
+                </div>
+                <div class="api-status-box">
+                    <span class="status-indicator-dot" id="apiKeyIndicator"></span>
+                    <span id="apiKeyStatusText" class="api-status-text">Key Missing (Analysis will fail)</span>
+                </div>
+            </div>
         </header>
 
         <main>
