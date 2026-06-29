@@ -376,3 +376,449 @@ textarea:focus {
         grid-column: span 1;
     }
 }
+
+/* ==========================================================================
+   NEW FRONTEND UPGRADES: CURSOR, SVG VISUALIZER, RISK METER, MODAL & FOOTER
+   ========================================================================== */
+
+/* 1. Custom Animated Cursor */
+body {
+    cursor: none; /* Hide default cursor on desktop */
+}
+
+a, button, textarea, input, .preset-btn, .close-modal-btn {
+    cursor: none !important; /* Ensure children hide default cursor too */
+}
+
+.custom-cursor-dot, .custom-cursor-ring {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-neon-blue);
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate3d(-50%, -50%, 0);
+    transition: width 0.15s, height 0.15s, opacity 0.15s, background-color 0.15s;
+}
+
+.custom-cursor-ring {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    /* Faster lag effect on ring */
+    transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+/* Interactive elements hover state - scales down & shifts opacity */
+.custom-cursor-ring.hovering {
+    width: 32px;
+    height: 32px;
+    border-color: rgba(255, 0, 127, 0.6);
+    background: rgba(255, 0, 127, 0.05);
+    box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+}
+
+.custom-cursor-dot.hovering {
+    background: var(--accent-neon-pink);
+    transform: translate3d(-50%, -50%, 0) scale(1.5);
+}
+
+/* Hide on mobile devices and touchscreens */
+@media (pointer: coarse) {
+    body {
+        cursor: auto;
+    }
+    a, button, textarea, input, .preset-btn, .close-modal-btn {
+        cursor: pointer !important;
+    }
+    .custom-cursor-dot, .custom-cursor-ring {
+        display: none !important;
+    }
+}
+
+/* 2. Swarm Visualizer SVG Graph */
+.swarm-visualizer-container {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    min-height: 240px;
+    align-items: center;
+}
+
+.swarm-svg {
+    width: 100%;
+    max-width: 380px;
+    height: auto;
+    overflow: visible;
+}
+
+.connector-path {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke 0.4s, filter 0.4s;
+}
+
+.connector-path.active {
+    stroke: var(--accent-blue);
+    stroke-dasharray: 8 6;
+    animation: flowDash 0.8s linear infinite;
+    filter: drop-shadow(0 0 4px var(--accent-blue));
+}
+
+@keyframes flowDash {
+    to {
+        stroke-dashoffset: -14;
+    }
+}
+
+/* Node Styles */
+.node {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node-bg {
+    fill: #0c1220;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 2;
+    transition: stroke 0.4s, fill 0.4s, filter 0.4s, r 0.4s;
+}
+
+.node-core {
+    fill: #1a2333;
+    transition: fill 0.4s;
+}
+
+.node-icon {
+    font-size: 1.2rem;
+    text-anchor: middle;
+    user-select: none;
+    dominant-baseline: middle;
+}
+
+.node-label {
+    fill: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-anchor: middle;
+    font-family: 'Space Grotesk', sans-serif;
+    user-select: none;
+    letter-spacing: 0.5px;
+}
+
+/* Node State Styles */
+.node.active .node-bg {
+    stroke: var(--accent-neon-blue);
+    fill: rgba(0, 240, 255, 0.05);
+    filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.4));
+}
+
+.node.active .node-core {
+    fill: rgba(0, 240, 255, 0.2);
+}
+
+.node.active .node-label {
+    fill: var(--text-primary);
+}
+
+.node.pulsing .node-bg {
+    stroke: var(--accent-blue);
+    animation: nodeGlow 1.2s ease infinite alternate;
+}
+
+@keyframes nodeGlow {
+    0% {
+        filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
+    }
+    100% {
+        filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.7));
+    }
+}
+
+.node.completed .node-bg {
+    stroke: var(--accent-emerald);
+    fill: rgba(16, 185, 129, 0.05);
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+}
+
+.node.completed .node-core {
+    fill: rgba(16, 185, 129, 0.2);
+}
+
+.node.completed .node-label {
+    fill: var(--text-primary);
+}
+
+/* Swarm Status Box */
+.swarm-status-box {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.status-title {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.status-val {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.text-idle { color: var(--text-secondary); }
+.text-ingest { color: #f59e0b; animation: pulse 1.5s infinite; }
+.text-dispatch { color: var(--accent-blue); animation: pulse 1.5s infinite; }
+.text-synthesize { color: #8b5cf6; animation: pulse 1.5s infinite; }
+.text-done { color: var(--accent-emerald); }
+
+/* 3. Report Header & Export Button */
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.report-header h2 {
+    margin-bottom: 0;
+}
+
+.export-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.export-btn:not(:disabled):hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--text-primary);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.export-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+}
+
+.export-icon {
+    flex-shrink: 0;
+}
+
+/* 4. Risk Metric Meter */
+.risk-meter-container {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.risk-meter-container.active {
+    opacity: 1;
+}
+
+.risk-metric-meter {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+.risk-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.risk-bar-bg {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.risk-progress-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: 5px;
+    background: var(--text-secondary);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s;
+}
+
+.risk-progress-bar.low {
+    width: 30%;
+    background: var(--accent-emerald);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.risk-progress-bar.medium {
+    width: 65%;
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.risk-progress-bar.high {
+    width: 100%;
+    background: var(--accent-neon-pink);
+    box-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
+}
+
+.risk-status-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    min-width: 80px;
+}
+
+.risk-status-text.low { color: var(--accent-emerald); }
+.risk-status-text.medium { color: #f59e0b; }
+.risk-status-text.high { color: var(--accent-neon-pink); }
+
+.confidence-metric {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.confidence-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.confidence-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-neon-blue);
+    font-family: 'Space Grotesk', sans-serif;
+    text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+}
+
+/* 5. Dashboard Footer */
+.dashboard-footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-link {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: var(--text-primary);
+}
+
+/* 6. Terms & Conditions Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 15, 25, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 500px;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    margin-bottom: 0;
+    font-size: 1.3rem;
+}
+
+.close-modal-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.8rem;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-modal-btn:hover {
+    color: var(--text-primary);
+}
+
+.compliance-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.compliance-text strong {
+    color: var(--accent-neon-blue);
+}
+

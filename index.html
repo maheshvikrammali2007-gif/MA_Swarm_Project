@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="custom-cursor-dot" id="cursorDot"></div>
+    <div class="custom-cursor-ring" id="cursorRing"></div>
     <div class="glow-bg"></div>
     <div class="container">
         <header>
@@ -38,45 +40,71 @@
 
             <section class="swarm-monitor glass-card">
                 <h2>Swarm Monitor</h2>
-                <p class="description">Real-time status tracking of concurrent agent threads.</p>
+                <p class="description">Real-time visualization of concurrent multi-agent cognitive threads.</p>
                 
-                <div class="timeline">
-                    <div class="timeline-step" id="step-ingest">
-                        <div class="status-indicator"></div>
-                        <div class="step-content">
-                            <h3>1. Ingestion Phase</h3>
-                            <p>Deconstructing clause into atomic components.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-step" id="step-dispatch">
-                        <div class="status-indicator"></div>
-                        <div class="step-content">
-                            <h3>2. Dispatching Sub-Tasks</h3>
-                            <p>Querying Legal Agent & Finance Agent concurrently.</p>
-                        </div>
-                        <div class="sub-threads">
-                            <div class="thread" id="thread-legal">
-                                <span class="thread-name">legal_agent.py</span>
-                                <span class="thread-status">Idle</span>
-                            </div>
-                            <div class="thread" id="thread-finance">
-                                <span class="thread-name">finance_agent.py</span>
-                                <span class="thread-status">Idle</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="timeline-step" id="step-synthesize">
-                        <div class="status-indicator"></div>
-                        <div class="step-content">
-                            <h3>3. Synthesize & Critique</h3>
-                            <p>Lead M&A Architect compiling executive summary & 3 Red Flags.</p>
-                        </div>
-                    </div>
+                <div class="swarm-visualizer-container">
+                    <svg viewBox="0 0 400 220" class="swarm-svg">
+                        <!-- Connection Paths -->
+                        <path d="M 200 60 L 100 160" id="path-legal" class="connector-path" />
+                        <path d="M 200 60 L 300 160" id="path-finance" class="connector-path" />
+                        
+                        <!-- Architect Node -->
+                        <g class="node node-architect active" id="node-architect">
+                            <circle cx="200" cy="60" r="28" class="node-bg" />
+                            <circle cx="200" cy="60" r="20" class="node-core" />
+                            <text x="200" y="65" class="node-icon">🧠</text>
+                            <text x="200" y="102" class="node-label">M&A Architect</text>
+                        </g>
+                        
+                        <!-- Legal Node -->
+                        <g class="node" id="node-legal">
+                            <circle cx="100" cy="160" r="24" class="node-bg" />
+                            <circle cx="100" cy="160" r="16" class="node-core" />
+                            <text x="100" y="165" class="node-icon">⚖️</text>
+                            <text x="100" y="198" class="node-label">Legal Agent</text>
+                        </g>
+                        
+                        <!-- Finance Node -->
+                        <g class="node" id="node-finance">
+                            <circle cx="300" cy="160" r="24" class="node-bg" />
+                            <circle cx="300" cy="160" r="16" class="node-core" />
+                            <text x="300" y="165" class="node-icon">💼</text>
+                            <text x="300" y="198" class="node-label">Finance Agent</text>
+                        </g>
+                    </svg>
+                </div>
+                
+                <div class="swarm-status-box">
+                    <span class="status-title">System Status:</span>
+                    <span id="systemStatusText" class="status-val text-idle">System Idle</span>
                 </div>
             </section>
 
             <section class="output-panel glass-card full-width">
-                <h2>Executive Synthesis Report</h2>
+                <div class="report-header">
+                    <h2>Executive Synthesis Report</h2>
+                    <button id="exportBtn" class="export-btn" onclick="exportReport()" disabled>
+                        <svg class="export-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                        </svg>
+                        Export Report
+                    </button>
+                </div>
+                
+                <div id="riskMeterContainer" class="risk-meter-container">
+                    <div class="risk-metric-meter">
+                        <span class="risk-label">Analysis Risk Rating:</span>
+                        <div class="risk-bar-bg">
+                            <div id="riskProgressBar" class="risk-progress-bar"></div>
+                        </div>
+                        <span id="riskStatusText" class="risk-status-text">No analysis yet</span>
+                    </div>
+                    <div class="confidence-metric">
+                        <span class="confidence-label">Confidence:</span>
+                        <span id="confidenceValue" class="confidence-value">--%</span>
+                    </div>
+                </div>
+                
                 <div class="report-box" id="reportOutput">
                     <div class="empty-state">
                         <p>No analysis run yet. Enter a clause above and execute the swarm.</p>
@@ -84,7 +112,27 @@
                 </div>
             </section>
         </main>
+        
+        <footer class="dashboard-footer">
+            <a href="#" id="tcBtn" class="footer-link" onclick="openTCModal(event)">Terms of Service & Privacy Compliance</a>
+        </footer>
     </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div id="tcModal" class="modal-overlay" onclick="closeTCModal(event)">
+        <div class="modal-content glass-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Privacy & Compliance</h2>
+                <button class="close-modal-btn" onclick="closeTCModal(event)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="compliance-text">
+                    <strong>Data Privacy & Governance:</strong> This engine operates using secure API layers. Inputted contract clauses are analyzed in real-time execution threads and are not retained or stored on external servers, ensuring strict enterprise confidentiality and compliance with standard M&A due diligence protocols.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
