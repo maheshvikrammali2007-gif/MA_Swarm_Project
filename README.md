@@ -1,6 +1,6 @@
 # Autonomous M&A Due Diligence Swarm (AMDS)
 
-🌐 **Live Web Application Link**: [https://ma-swarm-project.onrender.com](https://ma-swarm-project.onrender.com)
+🌐 **Live Web Application Link**: [https://maheshvikrammali2007-gif.github.io/MA_Swarm_Project/](https://maheshvikrammali2007-gif.github.io/MA_Swarm_Project/)
 
 Autonomous M&A Due Diligence Swarm (AMDS) is an enterprise-grade, asynchronous multi-agent orchestration framework powered by Google Gemini. It automates high-stakes corporate mergers and acquisitions (M&A) risk due diligence by coordinating a concurrent swarm of specialized domain AI agents (Legal, Finance) to ingest, process, synthesize, and critique complex contractual clauses in parallel.
 
